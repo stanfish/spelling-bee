@@ -2,7 +2,7 @@
 
 A modern, interactive web application for practicing spelling bee words. Built with [Next.js](https://nextjs.org), [Tailwind CSS](https://tailwindcss.com), and the Web Speech API.
 
-![Spelling Bee App](https://spelling-bee-study.netlify.app/)
+[Spelling Bee App](https://spelling-bee-study.netlify.app/)
 
 ## Features
 
