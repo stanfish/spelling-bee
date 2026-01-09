@@ -4,6 +4,7 @@ export interface WordStats {
     word: string;
     incorrectCount: number;
     totalAttempts: number;
+    averageTime?: number; // in milliseconds
     history: boolean[]; // true = correct, false = incorrect (track last 10)
 }
 
@@ -47,6 +48,7 @@ export function useWordStore() {
             word,
             incorrectCount: 0,
             totalAttempts: 0,
+            averageTime: 0,
             history: []
         }));
         setWords(initialWords);
@@ -62,6 +64,7 @@ export function useWordStore() {
                 word: trimmed,
                 incorrectCount: 0,
                 totalAttempts: 0,
+                averageTime: 0,
                 history: []
             }];
         });
@@ -71,15 +74,23 @@ export function useWordStore() {
         setWords(prev => prev.filter(w => w.word !== wordToDelete));
     }, []);
 
-    const updateWordResult = useCallback((targetWord: string, isCorrect: boolean) => {
+    const updateWordResult = useCallback((targetWord: string, isCorrect: boolean, timeSpentMs: number = 0) => {
         setWords(prev => prev.map(w => {
             if (w.word !== targetWord) return w;
 
             const newHistory = [...w.history, isCorrect].slice(-10); // Keep last 10
+
+            // Calculate new average time
+            // Formula: ((oldAvg * oldTotal) + newTime) / newTotal
+            const currentAvg = w.averageTime || 0;
+            const newTotalAttempts = w.totalAttempts + 1;
+            const newAverageTime = ((currentAvg * w.totalAttempts) + timeSpentMs) / newTotalAttempts;
+
             return {
                 ...w,
-                totalAttempts: w.totalAttempts + 1,
+                totalAttempts: newTotalAttempts,
                 incorrectCount: isCorrect ? w.incorrectCount : w.incorrectCount + 1,
+                averageTime: newAverageTime,
                 history: newHistory
             };
         }));
@@ -88,31 +99,40 @@ export function useWordStore() {
     const getWeightedRandomWord = useCallback(() => {
         if (words.length === 0) return null;
 
-        // Weight calculation: Base weight 1.
-        // +2 for every recent error in history? 
-        // Or just use incorrectCount?
-        // User asked: "if user answers it wrong, make it more chance to pick it later"
-        // Let's allow weight to scale with incorrectCount and recent failures.
-
-        const weightedPool: string[] = [];
+        let totalWeight = 0;
+        const wordWeights: { word: string; weight: number }[] = [];
 
         words.forEach(w => {
-            let weight = 1;
-            // Add weight for total incorrects to bias towards historically hard words
-            weight += w.incorrectCount * 2;
+            let correctRate = 0.33; // Default assumption for 0 attempts
 
-            // Add extra weight if largely wrong recently (last 3 attempts)
-            const recentFailures = w.history.slice(-3).filter(h => !h).length;
-            weight += recentFailures * 5;
-
-            // Push word 'weight' times into the pool
-            for (let i = 0; i < weight; i++) {
-                weightedPool.push(w.word);
+            if (w.totalAttempts > 0) {
+                correctRate = (w.totalAttempts - w.incorrectCount) / w.totalAttempts;
             }
+
+            // Weight is inverse of correct rate (lower rate = higher weight)
+            // Add small buffer to avoid division by zero if we used 1/rate, 
+            // but here we use 1 / (rate + 0.1) to create a nice curve.
+            // 0% correct -> 1 / 0.1 = 10
+            // 33% correct -> 1 / 0.43 = ~2.3
+            // 100% correct -> 1 / 1.1 = ~0.9
+            const weight = 1 / (correctRate + 0.1);
+
+            wordWeights.push({ word: w.word, weight });
+            totalWeight += weight;
         });
 
-        const randomIndex = Math.floor(Math.random() * weightedPool.length);
-        return weightedPool[randomIndex];
+        const randomValue = Math.random() * totalWeight;
+        let cumulativeWeight = 0;
+
+        for (const { word, weight } of wordWeights) {
+            cumulativeWeight += weight;
+            if (randomValue <= cumulativeWeight) {
+                return word;
+            }
+        }
+
+        // Fallback (should rarely reach here unless rounding errors)
+        return wordWeights[wordWeights.length - 1].word;
     }, [words]);
 
     return {

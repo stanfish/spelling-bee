@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useWordStore, WordStats } from '@/hooks/useWordStore';
 
-type SortKey = 'word' | 'attempts' | 'correctRate';
+type SortKey = 'word' | 'attempts' | 'correctRate' | 'averageTime';
 
 export default function WordList() {
     const { words, addWord, deleteWord } = useWordStore();
@@ -26,6 +26,11 @@ export default function WordList() {
         return Math.round(getCorrectRateVal(w) * 100) + '%';
     };
 
+    const formatTime = (ms?: number) => {
+        if (!ms) return '-';
+        return (ms / 1000).toFixed(1) + 's';
+    };
+
     const sortedWords = useMemo(() => {
         const sorted = [...words];
         sorted.sort((a, b) => {
@@ -44,6 +49,10 @@ export default function WordList() {
                 case 'correctRate':
                     valA = getCorrectRateVal(a);
                     valB = getCorrectRateVal(b);
+                    break;
+                case 'averageTime':
+                    valA = a.averageTime || 0;
+                    valB = b.averageTime || 0;
                     break;
             }
 
@@ -123,6 +132,14 @@ export default function WordList() {
                                         Correct Rate <SortIcon active={sortConfig.key === 'correctRate'} direction={sortConfig.direction} />
                                     </div>
                                 </th>
+                                <th
+                                    className="px-6 py-4 text-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                    onClick={() => requestSort('averageTime')}
+                                >
+                                    <div className="flex items-center justify-center">
+                                        Avg Time <SortIcon active={sortConfig.key === 'averageTime'} direction={sortConfig.direction} />
+                                    </div>
+                                </th>
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -139,13 +156,16 @@ export default function WordList() {
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${w.totalAttempts === 0
-                                                ? 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
-                                                : (1 - w.incorrectCount / w.totalAttempts) >= 0.8
-                                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                                    : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                            ? 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
+                                            : (1 - w.incorrectCount / w.totalAttempts) >= 0.8
+                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                                : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                                             }`}>
                                             {calculateCorrectRate(w)}
                                         </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-center text-gray-600 dark:text-gray-400 font-mono text-sm">
+                                        {formatTime(w.averageTime)}
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <button
@@ -160,7 +180,7 @@ export default function WordList() {
                             ))}
                             {words.length === 0 && (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-400 italic">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-400 italic">
                                         No words yet. Add some to get started!
                                     </td>
                                 </tr>

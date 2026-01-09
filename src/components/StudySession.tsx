@@ -10,13 +10,22 @@ export default function StudySession() {
     const [input, setInput] = useState('');
     const [feedback, setFeedback] = useState<'idle' | 'correct' | 'incorrect'>('idle');
     const [hasStarted, setHasStarted] = useState(false);
+    const [elapsedTime, setElapsedTime] = useState(0);
 
     const inputRef = useRef<HTMLInputElement>(null);
+    const startTimeRef = useRef<number | null>(null);
+    const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const startSession = () => {
         setHasStarted(true);
         nextWord();
     };
+
+    useEffect(() => {
+        return () => {
+            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+        };
+    }, []);
 
     const nextWord = () => {
         const word = getWeightedRandomWord();
@@ -24,6 +33,17 @@ export default function StudySession() {
             setCurrentWord(word);
             setInput('');
             setFeedback('idle');
+            setElapsedTime(0);
+
+            // Start timer
+            startTimeRef.current = Date.now();
+            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+            timerIntervalRef.current = setInterval(() => {
+                if (startTimeRef.current) {
+                    setElapsedTime(Date.now() - startTimeRef.current);
+                }
+            }, 100);
+
             // Small delay to ensure state update before speaking
             setTimeout(() => speak(word), 100);
             setTimeout(() => inputRef.current?.focus(), 50);
@@ -49,8 +69,16 @@ export default function StudySession() {
 
         // Validation
         const isCorrect = input.trim().toLowerCase() === currentWord.toLowerCase();
+
+        // Stop timer
+        if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current);
+            timerIntervalRef.current = null;
+        }
+        const finalTime = startTimeRef.current ? Date.now() - startTimeRef.current : 0;
+
         setFeedback(isCorrect ? 'correct' : 'incorrect');
-        updateWordResult(currentWord, isCorrect);
+        updateWordResult(currentWord, isCorrect, finalTime);
     };
 
     if (!hasStarted) {
@@ -160,6 +188,10 @@ export default function StudySession() {
                         autoCorrect="off"
                         spellCheck="false"
                     />
+
+                    <div className="absolute top-4 right-4 text-xs font-mono text-gray-400 pointer-events-none">
+                        {(elapsedTime / 1000).toFixed(1)}s
+                    </div>
 
                     <div className="min-h-[4rem] mt-6 flex flex-col items-center justify-center gap-4">
                         {feedback === 'idle' && (

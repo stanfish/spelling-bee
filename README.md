@@ -7,11 +7,12 @@ A modern, interactive web application for practicing spelling bee words. Built w
 ## Features
 
 -   **Study Mode:** Listen to words and spell them out.
+-   **Smart Learning:** Words you struggle with appear more frequently (weighted by performance).
+-   **Performance Tracking:** Tracks your time per word and calculates average speed.
 -   **Text-to-Speech:** Uses the browser's native Web Speech API to pronounce words.
--   **Weighted Randomness:** Adapts to your performance, showing difficult words more often.
--   **Voice Settings:** Adjustable speed and voice selection.
--   **Word Management:** Add, delete, and view statistics for your custom word list.
--   **Local Storage:** Your progress and word list are saved automatically.
+-   **Persistent Settings:** Voice selection and speed preferences are saved automatically.
+-   **Word Management:** Add, delete, and view statistics (correct rate, average time) for your custom word list.
+-   **Local Storage:** Your progress, word list, and settings are saved automatically.
 -   **Responsive Design:** Works seamlessly on desktop and mobile.
 -   **Keyboard Support:** Fully navigable using the keyboard for a smooth study flow.
 
