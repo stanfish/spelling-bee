@@ -9,10 +9,37 @@ export interface WordStats {
 }
 
 const DEFAULT_WORDS = [
-    "verdict", "imitation", "preamble", "commotion", "steeple", "suspicious", "fugitive", "nomad", "Berlin", "bracken", "rakish", "gusto", "jeered", "galore", "eccentric", "hippies", "pistachio",
-    "garbled", "miniature", "plausible", "oblivion", "spectators", "parchment", "heron", "billowed", "lunacy", "noggin", "hypnosis", "toiletries", "winsome", "emporium", "savant", "samosas", "mosque",
-    "encourages", "receptionist", "reprimanding", "immigrants", "lanyards", "ramshackle", "dissolving", "skewer", "conjure", "neon", "rotunda", "gleaned", "prattling", "atrium", "almanac", "campaign"
+    "albatross", "almanac", "ancestral", "anguish", "archipelago", "aroma", "artifacts", 
+    "asphalt", "atrium", "battlements", "beige", "Berlin", "billowed", "bracken", 
+    "brandished", "Buffalo", "campaign", "cavorting", "chartreuse", "chignon", 
+    "colossus", "commotion", "conical", "conjure", "conscience", "convulsively", 
+    "cosmetics", "courier", "crawdad", "deferential", "deflated", "delphine", 
+    "democracy", "dexterity", "dimensional", "discoveries", "dissolving", "dubious", 
+    "ebony", "eccentric", "emporium", "encourages", "enormous", "equestrian", 
+    "et cetera", "Everest", "fabulous", "fluently", "foreign", "fragments", 
+    "fraidycat", "Frankenstein", "frustration", "fugitive", "galleon", "gallop", 
+    "galore", "garbled", "garishly", "gaunt", "geranium", "gleaned", "graffitist", 
+    "grimace", "gusto", "guttural", "heron", "hesitate", "hippies", "hypnosis", 
+    "imitation", "immigrants", "jeered", "khaki", "language", "lanky", "lanyards", 
+    "lilt", "lo mein", "lunacy", "lurches", "magnanimous", "manticores", "marauder", 
+    "mascot", "miniature", "monsieur", "mosque", "moustache", "mysterious", 
+    "nautical", "Nehru", "neon", "noggin", "nomad", "oblivion", "opalescent", 
+    "paltry", "parchment", "pediatric", "perfume", "pheromone", "pinioning", 
+    "pistachio", "plaited", "plausible", "porridge", "prattling", "preamble", 
+    "prestigious", "prognosis", "psyche", "puissance", "rakish", "ramshackle", 
+    "ration", "receptionist", "reprimanding", "rickety", "rotunda", "rummage", 
+    "samosas", "sans serif", "sardines", "savant", "scavenger", "schema", 
+    "scorcher", "sequins", "serape", "sinister", "skewer", "slough", "spectators", 
+    "steeple", "stucco", "suspicious", "talcum", "toiletries", "tranquilizer", 
+    "tuxedo", "unleash", "unruly", "verdict", "vidimus", "wainscoting", "warlock", 
+    "winsome", "Yiddish", "zombielike"
 ];
+
+// const DEFAULT_WORDS = [
+//     "verdict", "imitation", "preamble", "commotion", "steeple", "suspicious", "fugitive", "nomad", "Berlin", "bracken", "rakish", "gusto", "jeered", "galore", "eccentric", "hippies", "pistachio",
+//     "garbled", "miniature", "plausible", "oblivion", "spectators", "parchment", "heron", "billowed", "lunacy", "noggin", "hypnosis", "toiletries", "winsome", "emporium", "savant", "samosas", "mosque",
+//     "encourages", "receptionist", "reprimanding", "immigrants", "lanyards", "ramshackle", "dissolving", "skewer", "conjure", "neon", "rotunda", "gleaned", "prattling", "atrium", "almanac", "campaign"
+// ];
 
 const STORAGE_KEY = 'spelling-bee-words';
 
