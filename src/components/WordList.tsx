@@ -4,7 +4,7 @@ import { useWordStore, WordStats } from '@/hooks/useWordStore';
 type SortKey = 'word' | 'attempts' | 'correctRate' | 'averageTime';
 
 export default function WordList() {
-    const { words, addWord, deleteWord } = useWordStore();
+    const { words, addWord, deleteWord, checkAndAddMissingWords } = useWordStore();
     const [newWord, setNewWord] = useState('');
     const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'asc' | 'desc' }>({ key: 'word', direction: 'asc' });
 
@@ -13,6 +13,15 @@ export default function WordList() {
         if (newWord.trim()) {
             addWord(newWord);
             setNewWord('');
+        }
+    };
+
+    const handleCheckUpdates = () => {
+        const count = checkAndAddMissingWords();
+        if (count > 0) {
+            alert(`Added ${count} new words from the default list!`);
+        } else {
+            alert('Your list is up to date with the default words.');
         }
     };
 
@@ -83,6 +92,13 @@ export default function WordList() {
                     <p className="text-gray-500 dark:text-gray-400 mt-1">
                         Manage your study list and track performance.
                     </p>
+                    <button
+                        onClick={handleCheckUpdates}
+                        className="text-sm font-medium text-yellow-600 dark:text-yellow-400 hover:text-yellow-700 dark:hover:text-yellow-300 mt-2 flex items-center transition-colors"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" /></svg>
+                        Check for new words
+                    </button>
                 </div>
 
                 <form onSubmit={handleAdd} className="flex w-full sm:w-auto relative">

@@ -9,29 +9,29 @@ export interface WordStats {
 }
 
 const DEFAULT_WORDS = [
-    "albatross", "almanac", "ancestral", "anguish", "archipelago", "aroma", "artifacts", 
-    "asphalt", "atrium", "battlements", "beige", "Berlin", "billowed", "bracken", 
-    "brandished", "Buffalo", "campaign", "cavorting", "chartreuse", "chignon", 
-    "colossus", "commotion", "conical", "conjure", "conscience", "convulsively", 
-    "cosmetics", "courier", "crawdad", "deferential", "deflated", "delphine", 
-    "democracy", "dexterity", "dimensional", "discoveries", "dissolving", "dubious", 
-    "ebony", "eccentric", "emporium", "encourages", "enormous", "equestrian", 
-    "et cetera", "Everest", "fabulous", "fluently", "foreign", "fragments", 
-    "fraidycat", "Frankenstein", "frustration", "fugitive", "galleon", "gallop", 
-    "galore", "garbled", "garishly", "gaunt", "geranium", "gleaned", "graffitist", 
-    "grimace", "gusto", "guttural", "heron", "hesitate", "hippies", "hypnosis", 
-    "imitation", "immigrants", "jeered", "khaki", "language", "lanky", "lanyards", 
-    "lilt", "lo mein", "lunacy", "lurches", "magnanimous", "manticores", "marauder", 
-    "mascot", "miniature", "monsieur", "mosque", "moustache", "mysterious", 
-    "nautical", "Nehru", "neon", "noggin", "nomad", "oblivion", "opalescent", 
-    "paltry", "parchment", "pediatric", "perfume", "pheromone", "pinioning", 
-    "pistachio", "plaited", "plausible", "porridge", "prattling", "preamble", 
-    "prestigious", "prognosis", "psyche", "puissance", "rakish", "ramshackle", 
-    "ration", "receptionist", "reprimanding", "rickety", "rotunda", "rummage", 
-    "samosas", "sans serif", "sardines", "savant", "scavenger", "schema", 
-    "scorcher", "sequins", "serape", "sinister", "skewer", "slough", "spectators", 
-    "steeple", "stucco", "suspicious", "talcum", "toiletries", "tranquilizer", 
-    "tuxedo", "unleash", "unruly", "verdict", "vidimus", "wainscoting", "warlock", 
+    "albatross", "almanac", "ancestral", "anguish", "archipelago", "aroma", "artifacts",
+    "asphalt", "atrium", "battlements", "beige", "Berlin", "billowed", "bracken",
+    "brandished", "Buffalo", "campaign", "cavorting", "chartreuse", "chignon",
+    "colossus", "commotion", "conical", "conjure", "conscience", "convulsively",
+    "cosmetics", "courier", "crawdad", "deferential", "deflated", "delphine",
+    "democracy", "dexterity", "dimensional", "discoveries", "dissolving", "dubious",
+    "ebony", "eccentric", "emporium", "encourages", "enormous", "equestrian",
+    "et cetera", "Everest", "fabulous", "fluently", "foreign", "fragments",
+    "fraidycat", "Frankenstein", "frustration", "fugitive", "galleon", "gallop",
+    "galore", "garbled", "garishly", "gaunt", "geranium", "gleaned", "graffitist",
+    "grimace", "gusto", "guttural", "heron", "hesitate", "hippies", "hypnosis",
+    "imitation", "immigrants", "jeered", "khaki", "language", "lanky", "lanyards",
+    "lilt", "lo mein", "lunacy", "lurches", "magnanimous", "manticores", "marauder",
+    "mascot", "miniature", "monsieur", "mosque", "moustache", "mysterious",
+    "nautical", "Nehru", "neon", "noggin", "nomad", "oblivion", "opalescent",
+    "paltry", "parchment", "pediatric", "perfume", "pheromone", "pinioning",
+    "pistachio", "plaited", "plausible", "porridge", "prattling", "preamble",
+    "prestigious", "prognosis", "psyche", "puissance", "rakish", "ramshackle",
+    "ration", "receptionist", "reprimanding", "rickety", "rotunda", "rummage",
+    "samosas", "sans serif", "sardines", "savant", "scavenger", "schema",
+    "scorcher", "sequins", "serape", "sinister", "skewer", "slough", "spectators",
+    "steeple", "stucco", "suspicious", "talcum", "toiletries", "tranquilizer",
+    "tuxedo", "unleash", "unruly", "verdict", "vidimus", "wainscoting", "warlock",
     "winsome", "Yiddish", "zombielike"
 ];
 
@@ -162,6 +162,95 @@ export function useWordStore() {
         return wordWeights[wordWeights.length - 1].word;
     }, [words]);
 
+    const checkForNewWords = useCallback(() => {
+        let addedCount = 0;
+        setWords(prev => {
+            const existingWordsSet = new Set(prev.map(w => w.word.toLowerCase()));
+            const newWords: WordStats[] = [];
+
+            DEFAULT_WORDS.forEach(defaultWord => {
+                if (!existingWordsSet.has(defaultWord.toLowerCase())) {
+                    newWords.push({
+                        word: defaultWord,
+                        incorrectCount: 0,
+                        totalAttempts: 0,
+                        averageTime: 0,
+                        history: []
+                    });
+                }
+            });
+
+            if (newWords.length > 0) {
+                addedCount = newWords.length;
+                return [...prev, ...newWords];
+            }
+            return prev;
+        });
+        return addedCount; // Note: This return value won't be accessible immediately if used inside setWords helper due to closure, 
+        // but we can calculate it before setting state if we want to return it.
+        // Actually, setWords is async-like. To return the count, we need to calculate it outside setWords 
+        // or use a different pattern. Let's calculate based on current 'words' state dependencies 
+        // but 'words' might be stale in a closure if not careful. 
+        // However, for this button click, using the current state 'words' is fine as it's triggered by user.
+    }, []);
+
+    // We need a version that returns the number for the UI to show.
+    // The state update pattern above is good for concurrency, but bad for returning the value.
+    // Let's refactor slightly to separate calculation.
+    const syncMissingDefaults = useCallback(() => {
+        let count = 0;
+        setWords(currentWords => {
+            const existingWordsSet = new Set(currentWords.map(w => w.word.toLowerCase()));
+            const wordsToAdd: WordStats[] = [];
+
+            DEFAULT_WORDS.forEach(defaultWord => {
+                if (!existingWordsSet.has(defaultWord.toLowerCase())) {
+                    wordsToAdd.push({
+                        word: defaultWord,
+                        incorrectCount: 0,
+                        totalAttempts: 0,
+                        averageTime: 0,
+                        history: []
+                    });
+                }
+            });
+
+            count = wordsToAdd.length;
+            if (count > 0) {
+                return [...currentWords, ...wordsToAdd];
+            }
+            return currentWords;
+        });
+        // We can't return 'count' from inside setWords. 
+        // We will calculate it synchronously against the current state before setting.
+        // This is safe enough for a manual trigger.
+    }, []);
+
+    const checkAndAddMissingWords = useCallback((): number => {
+        // Calculate diff against current state 'words' (from closure scope)
+        // Note: We need 'words' in the dependency array for this to work correctly.
+        const existingWordsSet = new Set(words.map(w => w.word.toLowerCase()));
+        const wordsToAdd: WordStats[] = [];
+
+        DEFAULT_WORDS.forEach(defaultWord => {
+            if (!existingWordsSet.has(defaultWord.toLowerCase())) {
+                wordsToAdd.push({
+                    word: defaultWord,
+                    incorrectCount: 0,
+                    totalAttempts: 0,
+                    averageTime: 0,
+                    history: []
+                });
+            }
+        });
+
+        if (wordsToAdd.length > 0) {
+            setWords(prev => [...prev, ...wordsToAdd]);
+        }
+
+        return wordsToAdd.length;
+    }, [words]);
+
     return {
         words,
         isLoaded,
@@ -169,6 +258,7 @@ export function useWordStore() {
         deleteWord,
         updateWordResult,
         getWeightedRandomWord,
+        checkAndAddMissingWords,
         resetStats: seedDefaults
     };
 }
