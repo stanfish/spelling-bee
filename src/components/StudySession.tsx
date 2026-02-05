@@ -201,65 +201,65 @@ export default function StudySession() {
                             <div className="text-gray-400 text-sm animate-pulse">Press Enter to check</div>
                         )}
                         {feedback !== 'idle' && (
-                            <>
-                                {feedback === 'correct' ? (
-                                    <div className="flex flex-col items-center animate-in zoom-in duration-300">
-                                        <span className="text-green-500 font-bold text-xl">Correct!</span>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center animate-in shake duration-300">
-                                        <span className="text-red-500 font-bold text-xl">Incorrect</span>
-                                        <span className="text-gray-500 mt-1">Correct spelling: <strong className="text-gray-900 dark:text-gray-100">{currentWord}</strong></span>
-                                    </div>
-                                )}
+                            feedback === 'correct' ? (
+                                <div className="flex flex-col items-center animate-in zoom-in duration-300">
+                                    <span className="text-green-500 font-bold text-xl">Correct!</span>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center animate-in shake duration-300">
+                                    <span className="text-red-500 font-bold text-xl">Incorrect</span>
+                                    <span className="text-gray-500 mt-1">Correct spelling: <strong className="text-gray-900 dark:text-gray-100">{currentWord}</strong></span>
+                                </div>
+                            )
+                        )}
 
-                                {/* Definition Card */}
-                                <div className="max-w-sm w-full bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 my-4 border border-gray-100 dark:border-gray-800 text-left animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
-                                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3 border-b border-gray-100 dark:border-gray-700 pb-2">
-                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white capitalize">
-                                            {currentWord}
-                                        </h3>
-                                        <div className="flex items-center gap-2 text-xs">
-                                            {definition?.partOfSpeech && (
-                                                <span className="italic text-gray-500 dark:text-gray-400 font-medium">
-                                                    {definition.partOfSpeech}
-                                                </span>
-                                            )}
-                                            {definition?.phonetic && (
-                                                <span className="font-mono text-gray-400">
-                                                    {definition.phonetic}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {isDefLoading ? (
-                                        <div className="h-16 flex items-center justify-center text-sm text-gray-400 gap-2">
-                                            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
-                                            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                                            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-200"></div>
-                                        </div>
-                                    ) : definition ? (
-                                        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                                            {definition.definition}
-                                        </p>
-                                    ) : (
-                                        <p className="text-gray-400 italic text-sm">
-                                            Definition not available.
-                                        </p>
+                        {/* Definition Card */}
+                        <div key={currentWord} className="max-w-sm w-full bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 my-4 border border-gray-100 dark:border-gray-800 text-left animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
+                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3 border-b border-gray-100 dark:border-gray-700 pb-2">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white capitalize">
+                                    {feedback === 'idle' ? 'Definition' : currentWord}
+                                </h3>
+                                <div className="flex items-center gap-2 text-xs">
+                                    {definition?.partOfSpeech && (
+                                        <span className="italic text-gray-500 dark:text-gray-400 font-medium">
+                                            {definition.partOfSpeech}
+                                        </span>
+                                    )}
+                                    {definition?.phonetic && feedback !== 'idle' && (
+                                        <span className="font-mono text-gray-400">
+                                            {definition.phonetic}
+                                        </span>
                                     )}
                                 </div>
+                            </div>
 
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        nextWord();
-                                    }}
-                                    className="px-6 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-full font-medium text-sm hover:scale-105 active:scale-95 transition-all shadow-md flex items-center gap-2"
-                                >
-                                    Next Word <span className="text-xs opacity-50">↵</span>
-                                </button>
-                            </>
+                            {isDefLoading ? (
+                                <div className="h-16 flex items-center justify-center text-sm text-gray-400 gap-2">
+                                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
+                                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-100"></div>
+                                    <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                                </div>
+                            ) : definition ? (
+                                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                                    {definition.definition}
+                                </p>
+                            ) : (
+                                <p className="text-gray-400 italic text-sm">
+                                    Definition not available.
+                                </p>
+                            )}
+                        </div>
+
+                        {feedback !== 'idle' && (
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    nextWord();
+                                }}
+                                className="px-6 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-full font-medium text-sm hover:scale-105 active:scale-95 transition-all shadow-md flex items-center gap-2"
+                            >
+                                Next Word <span className="text-xs opacity-50">↵</span>
+                            </button>
                         )}
                     </div>
                 </form>
