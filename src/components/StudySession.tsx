@@ -122,14 +122,14 @@ export default function StudySession() {
     }
 
     return (
-        <div className="w-full max-w-2xl mx-auto p-6 flex flex-col items-center gap-8 animate-in fade-in duration-500">
+        <div className="w-full max-w-4xl mx-auto p-6 flex flex-col items-center gap-8 animate-in fade-in duration-500">
 
             {/* Settings Row */}
             <div className="w-full flex flex-col sm:flex-row gap-4 items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                     <label className="text-xs text-gray-500 font-medium uppercase">Voice</label>
                     <select
-                        className="flex-1 sm:w-48 text-sm p-2 rounded-lg bg-gray-50 dark:bg-gray-800 border-none outline-none cursor-pointer"
+                        className="flex-1 sm:w-96 text-sm p-2 rounded-lg bg-gray-50 dark:bg-gray-800 border-none outline-none cursor-pointer"
                         value={selectedVoice?.name || ''}
                         onChange={e => {
                             const v = voices.find(voice => voice.name === e.target.value);
@@ -138,7 +138,7 @@ export default function StudySession() {
                     >
                         {voices.length === 0 && <option>Loading voices...</option>}
                         {voices.map(v => (
-                            <option key={v.name} value={v.name}>{v.name.slice(0, 20)}...</option>
+                            <option key={v.name} value={v.name}>{v.name.slice(0, 45)}...</option>
                         ))}
                     </select>
                 </div>
