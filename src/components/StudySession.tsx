@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, FormEvent } from 'react';
 import { useWordStore } from '@/hooks/useWordStore';
 import { useSpeech } from '@/hooks/useSpeech';
+import { useDictionary } from '@/hooks/useDictionary';
 
 export default function StudySession() {
     const { getWeightedRandomWord, updateWordResult } = useWordStore();
     const { speak, voices, selectedVoice, setSelectedVoice, rate, setRate } = useSpeech();
+    const { definition, fetchDefinition, isLoading: isDefLoading } = useDictionary();
 
     const [currentWord, setCurrentWord] = useState<string | null>(null);
     const [input, setInput] = useState('');
@@ -31,6 +33,7 @@ export default function StudySession() {
         const word = getWeightedRandomWord();
         if (word) {
             setCurrentWord(word);
+            fetchDefinition(word);
             setInput('');
             setFeedback('idle');
             setElapsedTime(0);
@@ -209,6 +212,43 @@ export default function StudySession() {
                                         <span className="text-gray-500 mt-1">Correct spelling: <strong className="text-gray-900 dark:text-gray-100">{currentWord}</strong></span>
                                     </div>
                                 )}
+
+                                {/* Definition Card */}
+                                <div className="max-w-sm w-full bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 my-4 border border-gray-100 dark:border-gray-800 text-left animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
+                                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3 border-b border-gray-100 dark:border-gray-700 pb-2">
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white capitalize">
+                                            {currentWord}
+                                        </h3>
+                                        <div className="flex items-center gap-2 text-xs">
+                                            {definition?.partOfSpeech && (
+                                                <span className="italic text-gray-500 dark:text-gray-400 font-medium">
+                                                    {definition.partOfSpeech}
+                                                </span>
+                                            )}
+                                            {definition?.phonetic && (
+                                                <span className="font-mono text-gray-400">
+                                                    {definition.phonetic}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {isDefLoading ? (
+                                        <div className="h-16 flex items-center justify-center text-sm text-gray-400 gap-2">
+                                            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
+                                            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-100"></div>
+                                            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                                        </div>
+                                    ) : definition ? (
+                                        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                                            {definition.definition}
+                                        </p>
+                                    ) : (
+                                        <p className="text-gray-400 italic text-sm">
+                                            Definition not available.
+                                        </p>
+                                    )}
+                                </div>
 
                                 <button
                                     onClick={(e) => {
